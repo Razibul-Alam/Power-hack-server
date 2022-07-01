@@ -32,8 +32,12 @@ async function run() {
     })
     // load all billings
     app.get('/api/billing-list', async(req,res)=>{
-        const getAllBills=await billsCollection.find({}).toArray();
-        res.json(getAllBills)
+      const pageNumber=req.query.page
+      const pageSize=req.query.pageSize
+        const getAllBills=await billsCollection.find({}).skip(parseInt(pageSize*pageNumber)).limit(parseInt(pageSize)).toArray();
+        const AllBills=await billsCollection.find({});
+        const dataCount= await AllBills.count()
+        res.send({dataCount,getAllBills})
     })
     // load single bill
     app.get('/api/single-billing/:id', async(req,res)=>{
@@ -73,9 +77,6 @@ async function run() {
   }
   run().catch(console.dir);
 
-app.get('/',(req,res)=>{
-    res.send('welcome to car point')
-})
 // server listening
 app.listen(port,()=>{
     console.log('server is running')
