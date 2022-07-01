@@ -36,7 +36,7 @@ async function run() {
         res.json(getAllBills)
     })
     // load single bill
-    app.get('api/single-billing/:id', async(req,res)=>{
+    app.get('/api/single-billing/:id', async(req,res)=>{
         const itemQuery=req.params.id
         const getSingleBill=await billsCollection.findOne({_id:ObjectId(itemQuery)});
         res.json(getSingleBill)
