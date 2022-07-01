@@ -19,7 +19,8 @@ async function run() {
       console.log('database connected')
       const database = client.db('Power-Hack');
     const billsCollection = database.collection('AllBills');
-    const userCollection=database.collection('users')
+    // const userCollection=database.collection('users')
+
     // add bill
     app.post('/api/add-billing', async(req,res)=>{
         console.log('hit here')
@@ -29,42 +30,26 @@ async function run() {
         res.json(insertedResult)
         console.log(insertedResult)
     })
-    // add user
-    app.post('/addUser', async(req,res)=>{
-        const user=req.body
-        console.log(user)
-        const insertedResult=await userCollection.insertOne(user)
-        res.json(insertedResult)
-    })
-    // load allevents
-    app.get('/allbills', async(req,res)=>{
+    // load all billings
+    app.get('/api/billing-list', async(req,res)=>{
         const getAllBills=await billsCollection.find({}).toArray();
         res.json(getAllBills)
     })
-    // load all bookings by email
-    app.get('/getOrdersByEmail', async(req,res)=>{
-        const queryEmail=req.query.email;
-        console.log(queryEmail)
-        const getOrders=await orderCollection.find({email:queryEmail}).toArray();
-        res.json(getOrders)
-    })
-    // load single item
-    app.get('/singleid/:id', async(req,res)=>{
+    // load single bill
+    app.get('api/single-billing/:id', async(req,res)=>{
         const itemQuery=req.params.id
         const getSingleBill=await billsCollection.findOne({_id:ObjectId(itemQuery)});
         res.json(getSingleBill)
     })
      
-    //  delete an item by id
-    app.delete('/removeBill/:id',async(req,res)=>{
+    //  delete bill by id
+    app.delete('/api/delete-billing/:id',async(req,res)=>{
         const removeId=req.params.id
-        // console.log(removeId)
         const deletedItem= await billsCollection.deleteOne({_id:ObjectId(removeId)})
-        // console.log(deletedItem)
         res.json(deletedItem)
     })
-   // Edit gov jobs
-   app.put("/updatebill/:id", async (req, res) => {
+   // Edit billing
+   app.put("/api/update-billing/:id", async (req, res) => {
     const filter = {_id: ObjectId(req.params.id) };
     console.log(filter);
     const updateStatus = {
