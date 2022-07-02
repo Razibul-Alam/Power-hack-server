@@ -32,12 +32,28 @@ async function run() {
     })
     // load all billings
     app.get('/api/billing-list', async(req,res)=>{
+      const category=req.query.category
+      const searchText=req.query.searchText
+      console.log(category,searchText)
       const pageNumber=req.query.page
-      const pageSize=req.query.pageSize
-        const getAllBills=await billsCollection.find({}).skip(parseInt(pageSize*pageNumber)).limit(parseInt(pageSize)).toArray();
+        let getAllBills=await billsCollection.find({}).skip(parseInt(10*pageNumber)).limit(10).toArray();
         const AllBills=await billsCollection.find({});
-        const dataCount= await AllBills.count()
-        res.send({dataCount,getAllBills})
+        let dataCount= await AllBills.count()
+        
+        if(searchText){
+          const getBills=await billsCollection.find({}).limit(10).toArray();
+           if(category=='email'){
+            getAllBills=getBills.filter(bill=>bill.email.includes(searchText))
+           }else if(category=='phone'){
+            getAllBills=getBills.filter(bill=>bill.phone.includes(searchText))
+           }else{
+            getAllBills=getBills.filter(bill=>bill.name.includes(searchText))
+           }
+           dataCount=10
+          res.send({dataCount,getAllBills})
+        }else{
+          res.send({dataCount,getAllBills})
+        }
     })
     // load single bill
     app.get('/api/single-billing/:id', async(req,res)=>{
