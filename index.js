@@ -5,6 +5,7 @@ const{MongoClient}=require('mongodb')
 require("dotenv").config();
 const{ObjectId}=require('mongodb');
 const { response } = require('express');
+const jsonToken=require('jsonwebtoken')
 const port=process.env.PORT || 5000
 //  using middleware
 app.use(cors())
@@ -44,11 +45,11 @@ async function run() {
         if(searchText){
           const getBills=await billsCollection.find({}).limit(10).toArray();
            if(category=='email'){
-            getAllBills=getBills.filter(bill=>bill.email.includes(searchText))
+            getAllBills=getBills.filter(bill=>bill.email.includes(searchText.toLocaleLowerCase()))
            }else if(category=='phone'){
-            getAllBills=getBills.filter(bill=>bill.phone.includes(searchText))
+            getAllBills=getBills.filter(bill=>bill.phone.includes(searchText.toLocaleLowerCase()))
            }else{
-            getAllBills=getBills.filter(bill=>bill.name.includes(searchText))
+            getAllBills=getBills.filter(bill=>bill.name.includes(searchText.toLocaleLowerCase()))
            }
            dataCount=10
           res.send({dataCount,getAllBills})
@@ -90,20 +91,32 @@ async function run() {
   });
   //user registration
   app.post('/api/registration', async(req,res)=>{
-    console.log('hit here')
     const registrationInfo=req.body
     console.log(registrationInfo)
     const insertedResult=await userCollection.insertOne(registrationInfo)
-    res.json(insertedResult)
+    res.send(insertedResult)
     console.log(insertedResult)
 })
 // login
 app.post('/api/login', async(req,res)=>{
   console.log('hit here')
   const loginInfo=req.body
-  console.log(loginInfo)
-  const insertedResult=await userCollection.findOne({password:loginInfo.password})
-  res.json({user:insertedResult})
+  // console.log(loginInfo)
+  const user=await userCollection.findOne({password:loginInfo.password});
+  if(user){
+    const token=jsonToken.sign({
+      name:user.name,
+      userId:user._id
+
+    },process.env.TOKEN_SECRET)
+    res.status(200).json({
+      "accesToken":token,
+      "message":'login successfully'
+    })
+  }
+  
+  console.log(user)
+  // res.json(user)
 })
 
     } finally {
