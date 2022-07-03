@@ -3,7 +3,8 @@ const app=express()
 const cors=require('cors')
 const{MongoClient}=require('mongodb')
 require("dotenv").config();
-const{ObjectId}=require('mongodb')
+const{ObjectId}=require('mongodb');
+const { response } = require('express');
 const port=process.env.PORT || 5000
 //  using middleware
 app.use(cors())
@@ -19,7 +20,7 @@ async function run() {
       console.log('database connected')
       const database = client.db('Power-Hack');
     const billsCollection = database.collection('AllBills');
-    // const userCollection=database.collection('users')
+    const userCollection=database.collection('users')
 
     // add bill
     app.post('/api/add-billing', async(req,res)=>{
@@ -87,6 +88,24 @@ async function run() {
     console.log(updateResult);
     res.json(updateResult);
   });
+  //user registration
+  app.post('/api/registration', async(req,res)=>{
+    console.log('hit here')
+    const registrationInfo=req.body
+    console.log(registrationInfo)
+    const insertedResult=await userCollection.insertOne(registrationInfo)
+    res.json(insertedResult)
+    console.log(insertedResult)
+})
+// login
+app.post('/api/login', async(req,res)=>{
+  console.log('hit here')
+  const loginInfo=req.body
+  console.log(loginInfo)
+  const insertedResult=await userCollection.findOne({password:loginInfo.password})
+  res.json({user:insertedResult})
+})
+
     } finally {
     //   await client.close();
     }
