@@ -102,7 +102,7 @@ app.post('/api/login', async(req,res)=>{
   console.log('hit here')
   const loginInfo=req.body
   // console.log(loginInfo)
-  const user=await userCollection.findOne({password:loginInfo.password});
+  const user=await userCollection.findOne({email:loginInfo.email,password:loginInfo.password});
   if(user){
     const token=jsonToken.sign({
       name:user.name,
@@ -111,7 +111,8 @@ app.post('/api/login', async(req,res)=>{
     },process.env.TOKEN_SECRET)
     res.status(200).json({
       "accesToken":token,
-      "message":'login successfully'
+      "message":'login successfully',
+     "user":{name:user.name,email:user.email}
     })
   }
   
