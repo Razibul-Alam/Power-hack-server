@@ -5,7 +5,8 @@ const{MongoClient}=require('mongodb')
 require("dotenv").config();
 const{ObjectId}=require('mongodb');
 const { response } = require('express');
-const jsonToken=require('jsonwebtoken')
+const jsonToken=require('jsonwebtoken');
+const checkAuthentication = require('./Middlewares/checkAuthentication');
 const port=process.env.PORT || 5000
 //  using middleware
 app.use(cors())
@@ -33,7 +34,7 @@ async function run() {
         console.log(insertedResult)
     })
     // load all billings
-    app.get('/api/billing-list', async(req,res)=>{
+    app.get('/api/billing-list', checkAuthentication, async(req,res)=>{
       const category=req.query.category
       const searchText=req.query.searchText
       console.log(category,searchText)
@@ -107,12 +108,14 @@ app.post('/api/login', async(req,res)=>{
     const token=jsonToken.sign({
       name:user.name,
       userId:user._id
-
-    },process.env.TOKEN_SECRET)
+    },process.env.TOKEN_SECRET,{
+      expiresIn:'1h'
+    })
     res.status(200).json({
       "accesToken":token,
       "message":'login successfully',
-     "user":{name:user.name,email:user.email}
+     name:user.name,
+     email:user.email
     })
   }
   
