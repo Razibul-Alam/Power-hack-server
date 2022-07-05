@@ -34,7 +34,7 @@ async function run() {
         console.log(insertedResult)
     })
     // load all billings
-    app.get('/api/billing-list', checkAuthentication, async(req,res)=>{
+    app.get('/api/billing-list', async(req,res)=>{
       const category=req.query.category
       const searchText=req.query.searchText
       console.log(category,searchText)
