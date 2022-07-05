@@ -40,9 +40,9 @@ async function run() {
       console.log(category,searchText)
       const pageNumber=req.query.page
         let getAllBills=await billsCollection.find({}).skip(parseInt(10*pageNumber)).limit(10).toArray();
-        const AllBills=await billsCollection.find({});
-        let dataCount= await AllBills.count()
-        
+        const AllBills=await billsCollection.find({}).toArray();
+        const countBills=await billsCollection.find({});
+        let dataCount= await countBills.count()
         if(searchText){
           const getBills=await billsCollection.find({}).limit(10).toArray();
            if(category=='email'){
@@ -53,9 +53,9 @@ async function run() {
             getAllBills=getBills.filter(bill=>bill.name.includes(searchText.toLocaleLowerCase()))
            }
            dataCount=10
-          res.send({dataCount,getAllBills})
+          res.send({dataCount,getAllBills,AllBills})
         }else{
-          res.send({dataCount,getAllBills})
+          res.send({dataCount,getAllBills,AllBills})
         }
     })
     // load single bill
