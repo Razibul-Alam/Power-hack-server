@@ -28,7 +28,7 @@ async function run() {
     app.post('/api/add-billing', async(req,res)=>{
         console.log('hit here')
         const billInfo=req.body
-        console.log(billInfo)
+        console.log('billing',billInfo)
         const insertedResult=await billsCollection.insertOne(billInfo)
         res.json(insertedResult)
         console.log(insertedResult)
@@ -37,7 +37,7 @@ async function run() {
     app.get('/api/billing-list', async(req,res)=>{
       const category=req.query.category
       const searchText=req.query.searchText
-      console.log(category,searchText)
+      // console.log(category,searchText)
       const pageNumber=req.query.page
         let getAllBills=await billsCollection.find({}).skip(parseInt(10*pageNumber)).limit(10).toArray();
         const AllBills=await billsCollection.find({}).toArray();
@@ -61,6 +61,7 @@ async function run() {
     // load single bill
     app.get('/api/single-billing/:id', async(req,res)=>{
         const itemQuery=req.params.id
+        console.log(itemQuery)
         const getSingleBill=await billsCollection.findOne({_id:ObjectId(itemQuery)});
         res.json(getSingleBill)
     })
@@ -68,13 +69,15 @@ async function run() {
     //  delete bill by id
     app.delete('/api/delete-billing/:id',async(req,res)=>{
         const removeId=req.params.id
-        const deletedItem= await billsCollection.deleteOne({_id:ObjectId(removeId)})
+        const deletedItem=await billsCollection.deleteOne({_id:ObjectId(removeId)});
         res.json(deletedItem)
+        // console.log(deletedItem,removeId)
+        
     })
    // Edit billing
    app.put("/api/update-billing/:id", async (req, res) => {
     const filter = {_id: ObjectId(req.params.id) };
-    console.log(filter);
+    // console.log(filter);
     const updateStatus = {
       $set: {
         name: req.body.name,
@@ -87,16 +90,16 @@ async function run() {
       filter,
       updateStatus
     );
-    console.log(updateResult);
+    // console.log(updateResult);
     res.json(updateResult);
   });
   //user registration
   app.post('/api/registration', async(req,res)=>{
     const registrationInfo=req.body
-    console.log(registrationInfo)
+    // console.log(registrationInfo)
     const insertedResult=await userCollection.insertOne(registrationInfo)
     res.send(insertedResult)
-    console.log(insertedResult)
+    // console.log(insertedResult)
 })
 // login
 app.post('/api/login', async(req,res)=>{
